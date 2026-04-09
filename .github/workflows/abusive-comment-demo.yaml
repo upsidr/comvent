@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Handle with Comvent
         uses: ./
@@ -25,12 +25,11 @@ jobs:
       # This assumes that comvent config holding 'some-abusive-content' as a keyword.
       - if: steps.comvent.outputs.some-abusive-content != ''
         name: Handle some abusive content
-        uses: actions/github-script@v3
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           # An example of removing the abusive comment, and leaving a comment about the deletion.
           script: |
-            github.issues.deleteComment({
+            github.rest.issues.deleteComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: ${{ github.event.comment.id }}
@@ -39,7 +38,7 @@ jobs:
             const comment = `Found abusive comment! 😰
             The comment was thus removed.`;
 
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
