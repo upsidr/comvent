@@ -2,22 +2,28 @@
 
 > Simple control for GitHub Actions to handle "comment event" - a building block for rich comment handling
 
-[![Build Status](https://github.com/rytswd/comvent/workflows/build-test/badge.svg)](build-status) | [![License: MIT](https://img.shields.io/badge/License-MIT-powderblue.svg)](mit) | [![GitHub Release Date](https://img.shields.io/github/release-date/rytswd/comvent?color=powderblue)](releases)
+[![Build Status](https://github.com/upsidr/comvent/workflows/build-test/badge.svg)](build-status) | [![License: MIT](https://img.shields.io/badge/License-MIT-powderblue.svg)](mit) | [![GitHub Release Date](https://img.shields.io/github/release-date/upsidr/comvent?color=powderblue)](releases)
 
 ![Example in action](./doc/asset/example01.png)
 
 <!--Placeholder-->
 
-[build-status]: https://github.com/rytswd/comvent/actions
+[build-status]: https://github.com/upsidr/comvent/actions
 [mit]: https://opensource.org/licenses/MIT
-[releases]: https://github.com/rytswd/comvent/releases
+[releases]: https://github.com/upsidr/comvent/releases
 
 ## 🌅 Contents
 
-- [Examples](#-examples)
-- [Action Inputs](#-action-inputs)
-- [Comvent Configuration File](#%EF%B8%8F-comvent-configuration-file)
-- [Action Outputs](#-action-outputs)
+- [⚡️ Comvent](#️-comvent)
+  - [🌅 Contents](#-contents)
+  - [🚀 Examples](#-examples)
+    - [ChatBot Setup](#chatbot-setup)
+    - [Handle Abusive Content](#handle-abusive-content)
+  - [🧪 Action Inputs](#-action-inputs)
+  - [⚙️ Comvent Configuration File](#️-comvent-configuration-file)
+    - [Example](#example)
+    - [Configuration Details](#configuration-details)
+  - [🍸 Action Outputs](#-action-outputs)
 
 ## 🚀 Examples
 
@@ -33,7 +39,7 @@ You can add Comvent setup at the beginning of the `issue_comment` event, and use
 
 ```yaml
 - name: Handle with Comvent
-  uses: rytswd/comvent@v0.3
+  uses: upsidr/comvent@v0.4
   id: comvent
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
@@ -43,14 +49,13 @@ You can add Comvent setup at the beginning of the `issue_comment` event, and use
 # This assumes that Comvent config holding 'command-random' as a keyword.
 - if: steps.comvent.outputs.command-random != ''
   name: Handle random event
-  uses: actions/github-script@v3
+  uses: actions/github-script@v8
   with:
-    github-token: ${{ secrets.GITHUB_TOKEN }}
     # An example of responding to a comment.
     script: |
       const comment = `Command \`/random\` was triggered by the comment`;
 
-      github.issues.createComment({
+      github.rest.issues.createComment({
         issue_number: context.issue.number,
         owner: context.repo.owner,
         repo: context.repo.repo,
@@ -83,7 +88,7 @@ jobs:
 
     steps:
       - name: Handle with Comvent
-        uses: rytswd/comvent@v0.3
+        uses: upsidr/comvent@v0.4
         id: comvent
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -93,14 +98,13 @@ jobs:
       # This assumes that Comvent config holding 'command-random' as a keyword.
       - if: steps.comvent.outputs.command-random != ''
         name: Handle random event
-        uses: actions/github-script@v3
+        uses: actions/github-script@v8
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           # An example of responding to a comment.
           script: |
             const comment = `Command \`/random\` was triggered by the comment`;
 
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -143,7 +147,7 @@ Using [github-script](https://github.com/actions/github-script), you can automat
 
 ```yaml
 - name: Handle with Comvent
-  uses: rytswd/comvent@v0.3
+  uses: upsidr/comvent@v0.4
   id: comvent
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
@@ -153,12 +157,11 @@ Using [github-script](https://github.com/actions/github-script), you can automat
 # This assumes that Comvent config holding 'some-abusive-content' as a keyword.
 - if: steps.comvent.outputs.some-abusive-content != ''
   name: Handle some abusive content
-  uses: actions/github-script@v3
+  uses: actions/github-script@v8
   with:
-    github-token: ${{ secrets.GITHUB_TOKEN }}
     # An example of removing the abusive comment, and leaving a comment about the deletion.
     script: |
-      github.issues.deleteComment({
+      github.rest.issues.deleteComment({
         owner: context.repo.owner,
         repo: context.repo.repo,
         comment_id: ${{ github.event.comment.id }}
@@ -167,7 +170,7 @@ Using [github-script](https://github.com/actions/github-script), you can automat
       const comment = `Found abusive comment! 😰
       The comment was thus removed.`;
 
-      github.issues.createComment({
+      github.rest.issues.createComment({
         issue_number: context.issue.number,
         owner: context.repo.owner,
         repo: context.repo.repo,
@@ -196,7 +199,7 @@ jobs:
 
     steps:
       - name: Handle with Comvent
-        uses: rytswd/comvent@v0.3
+        uses: upsidr/comvent@v0.4
         id: comvent
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -206,12 +209,11 @@ jobs:
       # This assumes that Comvent config holding 'some-abusive-content' as a keyword.
       - if: steps.comvent.outputs.some-abusive-content != ''
         name: Handle some abusive content
-        uses: actions/github-script@v3
+        uses: actions/github-script@v8
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           # An example of removing the abusive comment, and leaving a comment about the deletion.
           script: |
-            github.issues.deleteComment({
+            github.rest.issues.deleteComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: ${{ github.event.comment.id }}
@@ -220,7 +222,7 @@ jobs:
             const comment = `Found abusive comment! 😰
             The comment was thus removed.`;
 
-            github.issues.createComment({
+            github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -259,7 +261,7 @@ Comvent uses a dedicated YAML file for its configuration.
 
 ### Example
 
-The below is the copy of [`.github/comvent-setup.yaml`](https://github.com/rytswd/comvent/blob/main/.github/comvent-setup.yaml).
+The below is the copy of [`.github/comvent-setup.yaml`](https://github.com/upsidr/comvent/blob/main/.github/comvent-setup.yaml).
 
 ```yaml
 ---
@@ -292,7 +294,7 @@ keywords:
     value: '^\/random$' # Regex which looks for a comment with '/random'
 ```
 
-You can find a few examples in [`.github/`](https://github.com/rytswd/comvent/tree/main/.github) directory.
+You can find a few examples in [`.github/`](https://github.com/upsidr/comvent/tree/main/.github) directory.
 
 ### Configuration Details
 
